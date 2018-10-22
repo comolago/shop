@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ImageStream
+metadata:
+  creationTimestamp: null
+  name: inventory-artifacts
+  namespace: shop
+spec:
+  lookupPolicy:
+    local: false
+status:
+  dockerImageRepository: ""

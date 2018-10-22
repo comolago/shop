@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: inventory
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: inventory:0.1
+  source:
+    dockerfile: |-
+      FROM alpine:3.8
+      COPY app-root /opt/app-root
+      CMD /usr/libexec/s2i/run
+    images:
+    - from: 
+        kind: ImageStreamTag
+        name: inventory-artifacts:0.1
+      paths: 
+      - sourcePath: /opt/app-root
+        destinationDir: "."
+  strategy:
+    dockerStrategy:
+      from: 
+        kind: ImageStreamTag
+        name: alpine-s2i:3.8
+        namespace: toolchain
+  triggers:
+  - imageChange: {}
+    type: ImageChange

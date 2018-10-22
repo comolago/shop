@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  name: inventory-artifacts
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: inventory-artifacts:0.1
+  source:
+    git:
+      uri: https://github.com/comolago/shop
+      ref: master
+    contextDir: inventory
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: go-s2i:1.11
+        namespace: toolchain
