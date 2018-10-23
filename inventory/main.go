@@ -15,18 +15,14 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// Transports expose the service to the network. In this first example we utilize JSON over HTTP.
 func main() {
-	// Logging domain.
 	var logger log.Logger
 	{
 		logger = log.NewLogfmtLogger(os.Stdout)
 		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
-	// Logging domain.
 
-	//declare metrics
 	fieldKeys := []string{"method"}
 	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 		Namespace: "shop",
@@ -46,8 +42,6 @@ func main() {
 	svc = infrastructure.LoggingMiddleware(logger)(svc)
 	svc = infrastructure.Metrics(requestCount, requestLatency)(svc)
 
-	//rlbucket := ratelimit.NewBucket(1*time.Second, 5)
-
 	addItemHandler := httptransport.NewServer(
 		usecases.MakeAddItemEndpoint(svc),
 		usecases.DecodeAddItemRequest,
@@ -64,5 +58,4 @@ func main() {
 	http.Handle("/count", countHandler)
 	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":8080", nil)
-	//log.Fatal(http.ListenAndServe(":8080", nil))
 }
