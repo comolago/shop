@@ -1,7 +1,7 @@
 # Golang Image
 Edit the files to fit version of the GO S2I image you want to use.
 
-For example, to set it to build with Golang 1.7 inventory version 1.8, modify 
+For example, to set it to build with Golang 1.7 inventory version 0.8, modify 
 ```
 spec:
   output:

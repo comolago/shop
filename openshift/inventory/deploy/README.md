@@ -1,7 +1,7 @@
 # Golang Image
 Edit the files to fit version your application you want to publish and the version of the Alpine Linux you want to use to embed it.
 
-For example, to set it to embed version 0.8 of your application on Alpine Linuc 3.7
+For example, to set it to embed version 0.8 of your application on Alpine Linux 3.7
 ```
 spec:
   output:
