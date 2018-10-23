@@ -5,4 +5,5 @@ import (
 )
 
 
-var ErrEmpty = errors.New("The string is empty - please provie a value")
+var ErrNoId = errors.New("Id is empty - please provie a value")
+var ErrNoName = errors.New("Name is empty - please provie a value")

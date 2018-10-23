@@ -3,7 +3,7 @@ INSTALL_PATH ?= /opt/inventory
 PROJECT_HOME ?= github.com/comolago/shop/inventory
 GOBIN ?= /usr/local/src
 
-all: prepare 
+all: app 
 
 clean:
 	rm -f ${GOBIN}/${APP}
