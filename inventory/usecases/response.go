@@ -8,7 +8,7 @@ import (
 )
 
 type Response struct {
-	V   string `json:"v"`
+	Msg   string `json:"msg"`
 	Err string `json:"err,omitempty"` // errors don't define JSON marshaling
 }
 

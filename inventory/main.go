@@ -48,14 +48,7 @@ func main() {
 		usecases.EncodeResponse,
 	)
 
-	countHandler := httptransport.NewServer(
-		usecases.MakeCountEndpoint(svc),
-		usecases.DecodeCountRequest,
-		usecases.EncodeResponse,
-	)
-
 	http.Handle("/items/add", addItemHandler)
-	http.Handle("/count", countHandler)
 	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":8080", nil)
 }
