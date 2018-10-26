@@ -19,7 +19,7 @@ func LoggingMiddleware(logger log.Logger) domain.InventoryMiddleware {
 	}
 }
 
-func (mw loggingMiddleware) AddItem(id, name string) (output string, err error) {
+func (mw loggingMiddleware) AddItem(id int, name string) (output string, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"object", "item",

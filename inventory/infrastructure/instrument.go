@@ -24,7 +24,7 @@ func Metrics(requestCount metrics.Counter,
 	}
 }
 
-func (mw metricsMiddleware) AddItem(id, name string) (output string, err error) {
+func (mw metricsMiddleware) AddItem(id int, name string) (output string, err error) {
 	defer func(begin time.Time) {
 		lvs := []string{"method", "Word"}
 		mw.requestCount.With(lvs...).Add(1)

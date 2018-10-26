@@ -1,13 +1,15 @@
 package domain
 
 type InventoryInt interface {
-	AddItem(id, name string) (string, error)
+	AddItem(id int, name string) (string, error)
 }
 
-type Inventory struct{}
+type Inventory struct{
+	Items []Item
+}
 
-func (Inventory) AddItem(id, name string) (string, error) {
-	if id == "" {
+func (Inventory) AddItem(id int, name string) (string, error) {
+	if id == 0 {
 		return "", ErrNoId
 	}
 	if name == "" {
