@@ -13,6 +13,7 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+    "database/sql"
 )
 
 func main() {
@@ -37,7 +38,7 @@ func main() {
 		Help:      "Total duration of requests in microseconds.",
 	}, fieldKeys)
 
-	var svc domain.InventoryInt
+	var svc domain.InventoryHandler
 	svc = domain.Inventory{}
 	svc = infrastructure.LoggingMiddleware(logger)(svc)
 	svc = infrastructure.Metrics(requestCount, requestLatency)(svc)
@@ -47,7 +48,9 @@ func main() {
 		usecases.DecodeAddItemRequest,
 		usecases.EncodeResponse,
 	)
-
+        var db *sql.DB
+	infrastructure.InitDb(db)
+	defer db.Close()
 	http.Handle("/items/add", addItemHandler)
 	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":8080", nil)

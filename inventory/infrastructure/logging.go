@@ -8,18 +8,18 @@ import (
 )
 
 type loggingMiddleware struct {
-	domain.InventoryInt
+	domain.InventoryHandler
 	logger log.Logger
 }
 
 
-func LoggingMiddleware(logger log.Logger) domain.InventoryMiddleware {
-	return func(next domain.InventoryInt) domain.InventoryInt {
+func LoggingMiddleware(logger log.Logger) InventoryMiddleware {
+	return func(next domain.InventoryHandler) domain.InventoryHandler {
 		return loggingMiddleware{next, logger}
 	}
 }
 
-func (mw loggingMiddleware) AddItem(id, name string) (output string, err error) {
+func (mw loggingMiddleware) AddItem(id int, name string) (output string, err *domain.ErrHandler) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"object", "item",
@@ -30,6 +30,6 @@ func (mw loggingMiddleware) AddItem(id, name string) (output string, err error) 
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	output, err = mw.InventoryInt.AddItem(id, name)
+	output, err = mw.InventoryHandler.AddItem(id, name)
 	return output, err
 }
