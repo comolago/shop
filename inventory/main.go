@@ -38,7 +38,7 @@ func main() {
 		Help:      "Total duration of requests in microseconds.",
 	}, fieldKeys)
 
-	var svc domain.InventoryInt
+	var svc domain.InventoryHandler
 	svc = domain.Inventory{}
 	svc = infrastructure.LoggingMiddleware(logger)(svc)
 	svc = infrastructure.Metrics(requestCount, requestLatency)(svc)

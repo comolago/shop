@@ -2,20 +2,19 @@ package infrastructure
 
 import (
 	"time"
-
 	"github.com/comolago/shop/inventory/domain"
 	"github.com/go-kit/kit/metrics"
 )
 
 type metricsMiddleware struct {
-	domain.InventoryInt
+	domain.InventoryHandler
 	requestCount   metrics.Counter
 	requestLatency metrics.Histogram
 }
 
 func Metrics(requestCount metrics.Counter,
-	requestLatency metrics.Histogram) domain.InventoryMiddleware {
-	return func(next domain.InventoryInt) domain.InventoryInt {
+	requestLatency metrics.Histogram) InventoryMiddleware {
+	return func(next domain.InventoryHandler) domain.InventoryHandler {
 		return metricsMiddleware{
 			next,
 			requestCount,
@@ -24,12 +23,12 @@ func Metrics(requestCount metrics.Counter,
 	}
 }
 
-func (mw metricsMiddleware) AddItem(id int, name string) (output string, err error) {
+func (mw metricsMiddleware) AddItem(id int, name string) (output string, err *domain.ErrHandler) {
 	defer func(begin time.Time) {
 		lvs := []string{"method", "Word"}
 		mw.requestCount.With(lvs...).Add(1)
 		mw.requestLatency.With(lvs...).Observe(time.Since(begin).Seconds())
 	}(time.Now())
-	output, err = mw.InventoryInt.AddItem(id, name)
+	output, err = mw.InventoryHandler.AddItem(id, name)
 	return output, err
 }

@@ -9,14 +9,14 @@ import (
 	"github.com/go-kit/kit/endpoint"
 )
 
-func MakeAddItemEndpoint(svc domain.InventoryInt) endpoint.Endpoint {
+func MakeAddItemEndpoint(svc domain.InventoryHandler) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(domain.Item)
 		v, err := svc.AddItem(req.Id, req.Name)
 		if err != nil {
-			return Response{v, err.Error()}, nil
+			return Response{v, err}, nil
 		}
-		return Response{v, ""}, nil
+		return Response{v, nil}, nil
 	}
 }
 

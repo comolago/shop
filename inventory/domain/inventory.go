@@ -1,21 +1,20 @@
 package domain
 
-type InventoryInt interface {
-	AddItem(id int, name string) (string, error)
+type InventoryHandler interface {
+	AddItem(id int, name string) (string, *ErrHandler)
 }
 
 type Inventory struct{
 	Items []Item
 }
 
-func (Inventory) AddItem(id int, name string) (string, error) {
+func (Inventory) AddItem(id int, name string) (string, *ErrHandler) {
 	if id == 0 {
-		return "", ErrNoId
+		return "", &ErrHandler{1, "func (Inventory)", "AddItem", ""}
 	}
 	if name == "" {
-		return "", ErrNoName
+		return "", &ErrHandler{2, "func (Inventory)", "AddItem", ""}
 	}
 	return "item added", nil
 }
 
-type InventoryMiddleware func(InventoryInt) InventoryInt
