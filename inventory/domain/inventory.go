@@ -2,13 +2,21 @@ package domain
 
 type InventoryHandler interface {
 	AddItem(id int, name string) (string, *ErrHandler)
+   AddItemDBHandler()
+Open()
+}
+
+type DbHandler interface {
+   Open() *ErrHandler
+   getItem(inventory *Inventory) *ErrHandler
 }
 
 type Inventory struct{
-	Items []Item
+   Items []Item
+   Db DbHandler
 }
 
-func (Inventory) AddItem(id int, name string) (string, *ErrHandler) {
+func (i Inventory) AddItem(id int, name string) (string, *ErrHandler) {
 	if id == 0 {
 		return "", &ErrHandler{1, "func (Inventory)", "AddItem", ""}
 	}
@@ -18,3 +26,11 @@ func (Inventory) AddItem(id int, name string) (string, *ErrHandler) {
 	return "item added", nil
 }
 
+func (i Inventory) AddItemDBHandler()  {
+   
+   //i.Db=db
+}
+
+func (i Inventory) Open()  {
+   i.Db.Open()
+}
