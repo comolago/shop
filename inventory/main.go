@@ -22,9 +22,6 @@ func main() {
 		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
- 	//var dbh infrastructure.DbMiddleware
-        //dbh.Db=infrastructure.PostgresqlDb{}
-        //dbh.Db.Open()
 	fieldKeys := []string{"method"}
 	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 		Namespace: "shop",
@@ -40,20 +37,10 @@ func main() {
 	}, fieldKeys)
 
 	var svc domain.InventoryHandler
-        //var db *domain.PostgresqlDb=&domain.PostgresqlDb{}
-       
-
-        //svc =new(domain.Inventory)
-        //svc.Db=new(domain.PostgresqlDb) 
-	svc = domain.Inventory{nil,new(domain.PostgresqlDb)}
-        //svc.AddItemDBHandler(&db)
-	//svc = domain.Inventory{nil,domain.PostgresqlDb{}}
-	//svc.Db=domain.PostgresqlDb{}
-         //db.Open()
+	svc = domain.Inventory{nil,new(infrastructure.PostgresqlDb)}
         svc.Open()
-        //svc.Open()
+        svc.GetItemById(1)
 	svc = infrastructure.LoggingMiddleware(logger)(svc)
-	//svc = infrastructure.DbMiddleware(dbh)(svc)
 	svc = infrastructure.Metrics(requestCount, requestLatency)(svc)
 
 	addItemHandler := httptransport.NewServer(
@@ -62,9 +49,6 @@ func main() {
 		usecases.EncodeResponse,
 	)
 
-//db:= DbHandler
-       // var db *sql.DB
-//	infrastructure.InitDb(db)
 //	defer db.Close()
 	http.Handle("/items/add", addItemHandler)
 	http.Handle("/metrics", promhttp.Handler())
