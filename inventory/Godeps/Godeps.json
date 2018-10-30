@@ -52,6 +52,16 @@
 			"Rev": "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 		},
 		{
+			"ImportPath": "github.com/lib/pq",
+			"Comment": "v1.0.0-6-g9eb73ef",
+			"Rev": "9eb73efc1fcc404148b56765b0d3f61d9a5ef8ee"
+		},
+		{
+			"ImportPath": "github.com/lib/pq/oid",
+			"Comment": "v1.0.0-6-g9eb73ef",
+			"Rev": "9eb73efc1fcc404148b56765b0d3f61d9a5ef8ee"
+		},
+		{
 			"ImportPath": "github.com/matttproud/golang_protobuf_extensions/pbutil",
 			"Comment": "v1.0.1",
 			"Rev": "c12348ce28de40eed0136aa2b644d0ee0650e56c"

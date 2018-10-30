@@ -22,4 +22,6 @@ In this example s2i images are stored into *registry.domain.local:5000* registry
 To Test it, launch it and then issue curl commands such as:
 ```
 curl -XPOST -d'{"id":"11", "Name": "Fedora Red" }' localhost:8080/items/add
+
+curl localhost:8080/items/get/id/1
 ```

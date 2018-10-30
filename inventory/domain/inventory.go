@@ -1,13 +1,13 @@
 package domain
 
-import (
+/*import (
    "fmt"
-)
+)*/
 
 type InventoryHandler interface {
    Open()
    AddItem(id int, name string) (string, *ErrHandler)
-   GetItemById(id int)
+   GetItemById(id int) (Item, *ErrHandler)
 }
 
 type DbHandler interface {
@@ -34,8 +34,9 @@ func (i Inventory) Open()  {
    i.Db.Open()
 }
 
-func (i Inventory) GetItemById(id int) {
+func (i Inventory) GetItemById(id int) (Item, *ErrHandler) {
    var item Item
    i.Db.GetItemById(id,&item)
-   fmt.Println(item.Name)
+   //fmt.Println(item.Name)
+   return item, nil
 }
