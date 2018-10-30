@@ -22,6 +22,7 @@ type GetItemResponse struct {
 // endpoints wrapper
 type Endpoints struct {
 	GetItemEndpoint endpoint.Endpoint
+	AddItemEndpoint endpoint.Endpoint
 }
 
 
@@ -40,6 +41,14 @@ func MakeHttpHandler(_ context.Context, endpoint Endpoints, logger log.Logger) h
 		EncodeResponse,
 		options...,
 	))
+	//POST /lorem/{type}/{min}/{max}
+	r.Methods("POST").Path("/items/add").Handler(httptransport.NewServer(
+		endpoint.AddItemEndpoint,
+		DecodeAddItemRequest,
+		EncodeResponse,
+		options...,
+	))
+
 
 	return r
 
