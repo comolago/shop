@@ -57,12 +57,16 @@ ctx := context.Background()
 	svc = infrastructure.LoggingMiddleware(logger)(svc)
 	svc = infrastructure.Metrics(requestCount, requestLatency)(svc)
 
-        limit := rate.NewLimiter(rate.Every(35*time.Millisecond), 100)
+        getItemEndpointRateLimit := rate.NewLimiter(rate.Every(35*time.Millisecond), 100)
+        addItemEndpointRateLimit := rate.NewLimiter(rate.Every(35*time.Millisecond), 100)
 
-        e := usecases.MakeGetItemEndpoint(svc)
-	e = ratelimitkit.NewErroringLimiter(limit)(e)
+        getItemEndpoint := usecases.MakeGetItemEndpoint(svc)
+        addItemEndpoint := usecases.MakeAddItemEndpoint(svc)
+	getItemEndpoint = ratelimitkit.NewErroringLimiter(getItemEndpointRateLimit)(getItemEndpoint)
+	addItemEndpoint = ratelimitkit.NewErroringLimiter(addItemEndpointRateLimit)(addItemEndpoint)
 	endpoint := usecases.Endpoints{
-		GetItemEndpoint: e,
+		GetItemEndpoint: getItemEndpoint,
+		AddItemEndpoint: addItemEndpoint,
 	}
 
 
