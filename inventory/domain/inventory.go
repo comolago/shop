@@ -4,39 +4,28 @@ package domain
    "fmt"
 )*/
 
-type InventoryHandler interface {
-   Open()
-   AddItem(id int, name string) (string, *ErrHandler)
-   GetItemById(id int) (Item, *ErrHandler)
-}
-
-type DbHandler interface {
-   Open() *ErrHandler
-   GetItemById(int, *Item) *ErrHandler
-}
-
 type Inventory struct{
    Items []Item
    Db DbHandler
 }
 
-func (i Inventory) AddItem(id int, name string) (string, *ErrHandler) {
-   if id == 0 {
-      return "", &ErrHandler{1, "func (Inventory)", "AddItem", ""}
-   }
-   if name == "" {
-      return "", &ErrHandler{2, "func (Inventory)", "AddItem", ""}
-   }
-   return "item added", nil
-}
-
-func (i Inventory) Open()  {
-   i.Db.Open()
+func (i Inventory) Open() *ErrHandler  {
+   return i.Db.Open()
 }
 
 func (i Inventory) GetItemById(id int) (Item, *ErrHandler) {
    var item Item
-   i.Db.GetItemById(id,&item)
-   //fmt.Println(item.Name)
-   return item, nil
+   err := i.Db.GetItemById(id,&item)
+   return item, err
 }
+
+func (i Inventory) AddItem(id int, name string) (string, *ErrHandler) {
+   if id == 0 {
+      return "", &ErrHandler{10, "func (Inventory)", "AddItem", ""}
+   }
+   if name == "" {
+      return "", &ErrHandler{11, "func (Inventory)", "AddItem", ""}
+   }
+   return "item added", nil
+}
+

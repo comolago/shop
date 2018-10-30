@@ -12,6 +12,8 @@ import (
    "fmt"
 "github.com/go-kit/kit/log"
 httptransport "github.com/go-kit/kit/transport/http"
+
+"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type GetItemResponse struct {
@@ -27,21 +29,20 @@ type Endpoints struct {
 
 
 // Make Http Handler
-//		httptransport.ServerErrorEncoder(encodeError),
 func MakeHttpHandler(_ context.Context, endpoint Endpoints, logger log.Logger) http.Handler {
 	r := mux.NewRouter()
 	options := []httptransport.ServerOption{
 		httptransport.ServerErrorLogger(logger),
+		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	//POST /lorem/{type}/{min}/{max}
 	r.Methods("GET").Path("/items/get/{type}/{id}").Handler(httptransport.NewServer(
 		endpoint.GetItemEndpoint,
 		DecodeGetItemRequest,
 		EncodeResponse,
 		options...,
 	))
-	//POST /lorem/{type}/{min}/{max}
+
 	r.Methods("POST").Path("/items/add").Handler(httptransport.NewServer(
 		endpoint.AddItemEndpoint,
 		DecodeAddItemRequest,
@@ -49,12 +50,12 @@ func MakeHttpHandler(_ context.Context, endpoint Endpoints, logger log.Logger) h
 		options...,
 	))
 
-
+        r.Methods("GET").Path("/metrics").Handler(promhttp.Handler())
 	return r
 
 }
 
-/*func encodeError(_ context.Context, err error, w http.ResponseWriter) {
+func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	if err == nil {
 		panic("encodeError with nil error")
 	}
@@ -63,21 +64,27 @@ func MakeHttpHandler(_ context.Context, endpoint Endpoints, logger log.Logger) h
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"error": err.Error(),
 	})
-}*/
+}
 
 
 
 
 func MakeGetItemEndpoint(svc domain.InventoryHandler) endpoint.Endpoint {
    return func(_ context.Context, request interface{}) (interface{}, error) {
-      req := request.(domain.Item)
-      //if req.Id >=0  {
-         v, err := svc.GetItemById(req.Id)
+      var req domain.Item
+      var resp domain.Item
+      var err *domain.ErrHandler
+      req = request.(domain.Item)
+      if req.Id >=0  {
+         resp, err = svc.GetItemById(req.Id)
+         fmt.Println(resp.Id)
          if err != nil {
-            return GetItemResponse{v, err}, nil
+            return nil, err
          }
-      //}
-      return GetItemResponse{v, nil}, nil
+      } else {
+         return nil, &domain.ErrHandler{3, "func ", "MakeGetItemEndpoint", ""}
+      }
+      return GetItemResponse{resp, nil}, nil
    }
 }
 
@@ -99,7 +106,7 @@ func DecodeGetItemRequest(_ context.Context, r *http.Request) (interface{}, erro
          Id: id,
       }, nil
    } else {
-      return nil, &domain.ErrHandler{2, "func ", "DecodeGetItemRequest", ""}
+      return nil, &domain.ErrHandler{9, "func ", "DecodeGetItemRequest", ""}
    }
 }
 
@@ -109,7 +116,8 @@ func MakeAddItemEndpoint(svc domain.InventoryHandler) endpoint.Endpoint {
       req := request.(domain.Item)
       v, err := svc.AddItem(req.Id, req.Name)
       if err != nil {
-         return Response{v, err}, nil
+         //return Response{v, err}, nil
+         return nil, err
       }
       return Response{v, nil}, nil
    }
