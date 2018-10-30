@@ -1,5 +1,7 @@
 package main
 	//"github.com/prometheus/client_golang/prometheus/promhttp"
+//	httptransport "github.com/go-kit/kit/transport/http"
+ //  "github.com/gorilla/mux"
 
 import (
 	"net/http"
@@ -11,15 +13,23 @@ import (
 	"github.com/comolago/shop/inventory/infrastructure"
 	"github.com/comolago/shop/inventory/usecases"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
-	httptransport "github.com/go-kit/kit/transport/http"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-   "github.com/gorilla/mux"
    "fmt"
 "os/signal"
 "syscall"
+"time"
+ratelimitkit "github.com/go-kit/kit/ratelimit"
+
+"golang.org/x/time/rate"
+
+"golang.org/x/net/context"
 )
 
 func main() {
+
+
+ctx := context.Background()
+
 	var logger log.Logger
 	{
 		logger = log.NewLogfmtLogger(os.Stdout)
@@ -47,16 +57,25 @@ func main() {
 	svc = infrastructure.LoggingMiddleware(logger)(svc)
 	svc = infrastructure.Metrics(requestCount, requestLatency)(svc)
 
-	addItemHandler := httptransport.NewServer(
+        limit := rate.NewLimiter(rate.Every(35*time.Millisecond), 100)
+
+        e := usecases.MakeGetItemEndpoint(svc)
+	e = ratelimitkit.NewErroringLimiter(limit)(e)
+	endpoint := usecases.Endpoints{
+		GetItemEndpoint: e,
+	}
+
+
+	/*addItemHandler := httptransport.NewServer(
 		usecases.MakeAddItemEndpoint(svc),
 		usecases.DecodeAddItemRequest,
 		usecases.EncodeResponse,
-	)
-	getItemHandler := httptransport.NewServer(
+	)*/
+	/*getItemHandler := httptransport.NewServer(
 		usecases.MakeGetItemEndpoint(svc),
 		usecases.DecodeGetItemRequest,
 		usecases.EncodeResponse,
-	)
+	)*/
 
 //	defer db.Close()
 	//http.Handle("/items/get", getItemHandler)
@@ -66,9 +85,12 @@ func main() {
 
 errChan := make(chan error)
 
-r := mux.NewRouter()
-r.Methods("GET").Path("/items/get/{type}/{id}").Handler(getItemHandler)
-r.Methods("POST").Path("/items/add").Handler(addItemHandler)
+//r := mux.NewRouter()
+//r.Methods("GET").Path("/items/get/{type}/{id}").Handler(getItemHandler)
+//r.Methods("POST").Path("/items/add").Handler(addItemHandler)
+
+r := usecases.MakeHttpHandler(ctx, endpoint, logger)
+
 
 go func() {
 		fmt.Println("Starting server at port 8080")
