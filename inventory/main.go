@@ -1,4 +1,5 @@
 package main
+	//"github.com/prometheus/client_golang/prometheus/promhttp"
 
 import (
 	"net/http"
@@ -12,8 +13,10 @@ import (
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	httptransport "github.com/go-kit/kit/transport/http"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-    "database/sql"
+   "github.com/gorilla/mux"
+   "fmt"
+"os/signal"
+"syscall"
 )
 
 func main() {
@@ -23,7 +26,6 @@ func main() {
 		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
-
 	fieldKeys := []string{"method"}
 	requestCount := kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 		Namespace: "shop",
@@ -39,7 +41,9 @@ func main() {
 	}, fieldKeys)
 
 	var svc domain.InventoryHandler
-	svc = domain.Inventory{}
+	svc = domain.Inventory{nil,new(infrastructure.PostgresqlDb)}
+        svc.Open()
+        svc.GetItemById(1)
 	svc = infrastructure.LoggingMiddleware(logger)(svc)
 	svc = infrastructure.Metrics(requestCount, requestLatency)(svc)
 
@@ -48,10 +52,38 @@ func main() {
 		usecases.DecodeAddItemRequest,
 		usecases.EncodeResponse,
 	)
-        var db *sql.DB
-	infrastructure.InitDb(db)
-	defer db.Close()
-	http.Handle("/items/add", addItemHandler)
-	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":8080", nil)
+	getItemHandler := httptransport.NewServer(
+		usecases.MakeGetItemEndpoint(svc),
+		usecases.DecodeGetItemRequest,
+		usecases.EncodeResponse,
+	)
+
+//	defer db.Close()
+	//http.Handle("/items/get", getItemHandler)
+	//http.Handle("/items/add", addItemHandler)
+	//http.Handle("/metrics", promhttp.Handler())
+	//http.ListenAndServe(":8080", nil)
+
+errChan := make(chan error)
+
+r := mux.NewRouter()
+r.Methods("GET").Path("/items/get/{type}/{id}").Handler(getItemHandler)
+r.Methods("POST").Path("/items/add").Handler(addItemHandler)
+
+go func() {
+		fmt.Println("Starting server at port 8080")
+		handler := r
+		errChan <- http.ListenAndServe(":8080", handler)
+	}()
+
+
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		errChan <- fmt.Errorf("%s", <-c)
+	}()
+fmt.Println(<- errChan)
+
 }
+
+
