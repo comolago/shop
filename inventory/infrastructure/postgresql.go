@@ -1,3 +1,4 @@
+// infrastructure implementation details
 package infrastructure
 
 import (
@@ -9,6 +10,7 @@ import (
    _ "github.com/lib/pq"
 )
 
+// Constants
 const (
    dbhost = "DBHOST"
    dbport = "DBPORT"
@@ -17,6 +19,7 @@ const (
    dbname = "DBNAME"
 )
 
+// Attributes
 type PostgresqlDb struct {
    conn *sql.DB
    host       string
@@ -26,6 +29,7 @@ type PostgresqlDb struct {
    dbname     string
 }
 
+// Load configuration from environment variables
 func (pg *PostgresqlDb) config() *domain.ErrHandler {
    var port string
    ok := false
@@ -57,6 +61,8 @@ func (pg *PostgresqlDb) config() *domain.ErrHandler {
 INSERT INTO inventory VALUES (1,'Fedora Red', 5);
 
 */
+
+// Open connection to database
 func (pg *PostgresqlDb)Open() *domain.ErrHandler {
    connErr:= pg.config() 
    if connErr != nil {
@@ -76,6 +82,7 @@ func (pg *PostgresqlDb)Open() *domain.ErrHandler {
    return nil
 }
 
+// Retrieve an Item by its id from database
 func (pg *PostgresqlDb)GetItemById(id int, item *domain.Item) *domain.ErrHandler {
    if pg.conn == nil {
       return &domain.ErrHandler{7, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", ""}

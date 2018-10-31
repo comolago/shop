@@ -1,3 +1,4 @@
+// Application Business Rules
 package usecases
 
 import (
@@ -8,14 +9,15 @@ import (
    "github.com/go-kit/kit/endpoint"
    "github.com/gorilla/mux"
    "strconv"
-   "fmt"
 )
 
-type GetItemResponse struct {
+// Response type with a Item type message
+type ItemResponse struct {
    Msg   domain.Item `json:",omitempty"`
    Err *domain.ErrHandler `json:",omitempty"`
 }
 
+// Create GetItemById endpoint
 func MakeGetItemEndpoint(svc domain.InventoryHandler) endpoint.Endpoint {
    return func(_ context.Context, request interface{}) (interface{}, error) {
       var req domain.Item
@@ -24,22 +26,20 @@ func MakeGetItemEndpoint(svc domain.InventoryHandler) endpoint.Endpoint {
       req = request.(domain.Item)
       if req.Id >=0  {
          resp, err = svc.GetItemById(req.Id)
-         fmt.Println(resp.Id)
          if err != nil {
             return nil, err
          }
       } else {
          return nil, &domain.ErrHandler{3, "func ", "MakeGetItemEndpoint", ""}
       }
-      return GetItemResponse{resp, nil}, nil
+      return ItemResponse{resp, nil}, nil
    }
 }
 
+// Decode GetItemById requests
 func DecodeGetItemRequest(_ context.Context, r *http.Request) (interface{}, error) {
-   fmt.Println("qui")
    vars := mux.Vars(r)
    requestType, ok := vars["type"]
-   fmt.Println(requestType)
    if !ok {
       return nil, &domain.ErrHandler{1, "func ", "DecodeGetItemRequest", requestType}
    }
@@ -57,19 +57,20 @@ func DecodeGetItemRequest(_ context.Context, r *http.Request) (interface{}, erro
    }
 }
 
+// Create AddItem endpoint
 func MakeAddItemEndpoint(svc domain.InventoryHandler) endpoint.Endpoint {
    return func(_ context.Context, request interface{}) (interface{}, error) {
-   fmt.Println("qua")
       req := request.(domain.Item)
       v, err := svc.AddItem(req.Id, req.Name)
       if err != nil {
-         //return Response{v, err}, nil
+         //return StringResponse{v, err}, nil
          return nil, err
       }
-      return Response{v, nil}, nil
+      return StringResponse{v, nil}, nil
    }
 }
 
+// Decode AddItem requests
 func DecodeAddItemRequest(_ context.Context, r *http.Request) (interface{}, error) {
    var request domain.Item
    if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
