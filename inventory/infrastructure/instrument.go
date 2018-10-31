@@ -1,3 +1,4 @@
+// infrastructure implementation details
 package infrastructure
 
 import (
@@ -6,12 +7,14 @@ import (
    "github.com/go-kit/kit/metrics"
 )
 
+// Define metrics
 type metricsMiddleware struct {
    domain.InventoryHandler
    requestCount   metrics.Counter
    requestLatency metrics.Histogram
 }
 
+// Define the metrics function
 func Metrics(requestCount metrics.Counter,
    requestLatency metrics.Histogram) InventoryMiddleware {
    return func(next domain.InventoryHandler) domain.InventoryHandler {
@@ -23,6 +26,7 @@ func Metrics(requestCount metrics.Counter,
    }
 }
 
+// Define AddItem helper function to handle metrics
 func (mw metricsMiddleware) AddItem(id int, name string) (output string, err *domain.ErrHandler) {
    defer func(begin time.Time) {
       lvs := []string{"method", "AddItem"}
@@ -33,6 +37,7 @@ func (mw metricsMiddleware) AddItem(id int, name string) (output string, err *do
    return output, err
 }
 
+// Define GetItemById helper function to handle metrics
 func (mw metricsMiddleware) GetItemById(id int) (output domain.Item, err *domain.ErrHandler) {
    defer func(begin time.Time) {
       lvs := []string{"method", "GetItem"}

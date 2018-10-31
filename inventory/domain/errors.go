@@ -1,5 +1,8 @@
+// Business Rules
 package domain
 
+// error messages:
+// 1 is reserved to preserve error messages of external libraries
 var errors = [...]string{
 	1: "", // EXTERNAL_LIBRARY - used to handle external library errors
         2: "DBHOST environment variable required but not set",
