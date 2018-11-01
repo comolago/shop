@@ -57,10 +57,25 @@ func (pg *PostgresqlDb) config() *domain.ErrHandler {
    return nil
 }
 
-/*CREATE TABLE inventory(id integer NOT NULL,name varchar(200) NOT NULL,quantity integer NOT NULL DEFAULT 0,CONSTRAINT inventory_pk PRIMARY KEY (id));
-INSERT INTO inventory VALUES (1,'Fedora Red', 5);
+func (pg *PostgresqlDb)initDb() *domain.ErrHandler {
+   if pg.conn == nil {
+      return &domain.ErrHandler{7, "func (pg PostgresqlDb)", "initDb()", ""}
+   }
+   if _, err := pg.conn.Exec("CREATE TABLE IF NOT EXISTS inventory(id integer NOT NULL,name varchar(200) NOT NULL,quantity integer NOT NULL DEFAULT 0,CONSTRAINT inventory_pk PRIMARY KEY (id));"); err != nil {
+      return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "initDb(()", err.Error()}
+   }
+   return nil
+}
 
-*/
+func (pg *PostgresqlDb)AddItem(item domain.Item) *domain.ErrHandler {
+   if pg.conn == nil {
+      return &domain.ErrHandler{7, "func (pg PostgresqlDb)", "AddItem(item domain.Item)", ""}
+   }
+   if _, err := pg.conn.Exec("INSERT INTO inventory (id,name,quantity) VALUES ($1,$2, $3);", item.Id, item.Name, item.Quantity); err != nil {
+      return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "initDb(()", err.Error()}
+   }
+   return nil
+}
 
 // Open connection to database
 func (pg *PostgresqlDb)Open() *domain.ErrHandler {
@@ -77,7 +92,10 @@ func (pg *PostgresqlDb)Open() *domain.ErrHandler {
    err = pg.conn.Ping()
    if err != nil {
       return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "Open", err.Error()}
-      panic(err)
+   }
+   connErr = pg.initDb()
+   if connErr != nil {
+      return connErr
    }
    return nil
 }
@@ -87,7 +105,7 @@ func (pg *PostgresqlDb)GetItemById(id int, item *domain.Item) *domain.ErrHandler
    if pg.conn == nil {
       return &domain.ErrHandler{7, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", ""}
    }
-   recordset, err := pg.conn.Query("SELECT id, name FROM inventory WHERE id=$1;", id)
+   recordset, err := pg.conn.Query("SELECT id, name, quantity FROM inventory WHERE id=$1;", id)
    if err != nil {
       return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", err.Error()}
    }
@@ -96,6 +114,7 @@ func (pg *PostgresqlDb)GetItemById(id int, item *domain.Item) *domain.ErrHandler
       err = recordset.Scan(
          &item.Id,
          &item.Name,
+         &item.Quantity,
       )
       if err != nil {
          return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", err.Error()}
@@ -104,6 +123,16 @@ func (pg *PostgresqlDb)GetItemById(id int, item *domain.Item) *domain.ErrHandler
    err = recordset.Err()
    if err != nil {
       return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", err.Error()}
+   }
+   return nil
+}
+
+func (pg *PostgresqlDb)DelItemById(id int) *domain.ErrHandler {
+   if pg.conn == nil {
+      return &domain.ErrHandler{7, "func (pg PostgresqlDb)", "DelItemById(id int)", ""}
+   }
+   if _, err := pg.conn.Exec("DELETE FROM inventory WHERE id=$1;", id); err != nil {
+      return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "DelItemById(id int)", err.Error()}
    }
    return nil
 }

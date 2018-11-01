@@ -24,4 +24,6 @@ To Test it, launch it and then issue curl commands such as:
 curl -XPOST -d'{"id":"11", "Name": "Fedora Red" }' localhost:8080/items/add
 
 curl localhost:8080/items/get/id/1
+
+curl -X DELETE localhost:8080/items/1
 ```

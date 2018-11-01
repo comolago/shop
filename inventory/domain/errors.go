@@ -15,4 +15,5 @@ var errors = [...]string{
 	9: "The requested field does not exist in this collection",
 	10: "Item Id is empty - please provide a value",
 	11: "Item Name is empty - please provide a value",
+	12: "Item Quantity is empty - please provide a value",
 }

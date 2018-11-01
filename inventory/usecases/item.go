@@ -13,7 +13,7 @@ import (
 
 // Response type with a Item type message
 type ItemResponse struct {
-   Msg   domain.Item `json:",omitempty"`
+   Msg   domain.Item `json:"msg,omitempty"`
    Err *domain.ErrHandler `json:",omitempty"`
 }
 
@@ -61,7 +61,7 @@ func DecodeGetItemRequest(_ context.Context, r *http.Request) (interface{}, erro
 func MakeAddItemEndpoint(svc domain.InventoryHandler) endpoint.Endpoint {
    return func(_ context.Context, request interface{}) (interface{}, error) {
       req := request.(domain.Item)
-      v, err := svc.AddItem(req.Id, req.Name)
+      v, err := svc.AddItem(req)
       if err != nil {
          //return StringResponse{v, err}, nil
          return nil, err
@@ -77,5 +77,45 @@ func DecodeAddItemRequest(_ context.Context, r *http.Request) (interface{}, erro
       return nil, err
    }
    return request, nil
+}
+
+// Create DelItemById endpoint
+func MakeDelItemEndpoint(svc domain.InventoryHandler) endpoint.Endpoint {
+   return func(_ context.Context, request interface{}) (interface{}, error) {
+      var req domain.Item
+      var resp string
+      var err *domain.ErrHandler
+      req = request.(domain.Item)
+      if req.Id >=0  {
+         resp, err = svc.DelItemById(req.Id)
+         if err != nil {
+            return nil, err
+         }
+      } else {
+         return nil, err
+      }
+      return StringResponse{resp, nil}, nil
+   }
+}
+
+// Decode DelItemById requests
+func DecodeDelItemRequest(_ context.Context, r *http.Request) (interface{}, error) {
+   vars := mux.Vars(r)
+   /*requestType, ok := vars["type"]
+   if !ok {
+      return nil, &domain.ErrHandler{1, "func ", "DecodeDelItemRequest", requestType}
+   }
+   if requestType == "id" {*/
+      tmpid, ok := vars["id"]
+      if !ok {
+         return nil, &domain.ErrHandler{2, "func ", "DecodeDelItemRequest", ""}
+      }
+      id, _ := strconv.Atoi(tmpid)
+      return domain.Item{
+         Id: id,
+      }, nil
+   /*} else {
+      return nil, &domain.ErrHandler{9, "func ", "DecodeDelItemRequest", ""}
+   }*/
 }
 

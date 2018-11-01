@@ -22,18 +22,19 @@ func LoggingMiddleware(logger log.Logger) InventoryMiddleware {
 }
 
 // Define AddItem helper function to handle logging
-func (mw loggingMiddleware) AddItem(id int, name string) (output string, err *domain.ErrHandler) {
+func (mw loggingMiddleware) AddItem(item domain.Item) (output string, err *domain.ErrHandler) {
    defer func(begin time.Time) {
       mw.logger.Log(
          "object", "item",
          "action", "add",
-         "id", id,
-         "name", name,
+         "id", item.Id,
+         "name", item.Name,
+         "quantity", item.Quantity,
          "result", output,
          "took", time.Since(begin),
       )
    }(time.Now())
-   output, err = mw.InventoryHandler.AddItem(id, name)
+   output, err = mw.InventoryHandler.AddItem(item)
    return output, err
 }
 
@@ -51,4 +52,20 @@ func (mw loggingMiddleware) GetItemById(id int) (output domain.Item, err *domain
    }(time.Now())
    output, err = mw.InventoryHandler.GetItemById(id)
    return output, err
+}
+
+// Define DelItemById helper function to handle logging
+func (mw loggingMiddleware) DelItemById(id int) (output string, err *domain.ErrHandler) {
+   defer func(begin time.Time) {
+      mw.logger.Log(
+         "object", "item",
+         "action", "del",
+         "type", "id",
+         "id", id,
+         "result", "deleted",
+         "took", time.Since(begin),
+      )
+   }(time.Now())
+   output, err  = mw.InventoryHandler.DelItemById(id)
+   return output, err 
 }
