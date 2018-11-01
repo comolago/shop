@@ -7,8 +7,9 @@ package domain
 // GetItemById retrieve an item given its id
 type InventoryHandler interface {
    Open() *ErrHandler
-   AddItem(id int, name string) (string, *ErrHandler)
+   AddItem(item Item) (string, *ErrHandler)
    GetItemById(id int) (Item, *ErrHandler)
+   DelItemById(id int) (string, *ErrHandler)
 }
 
 // DB interface
@@ -17,4 +18,6 @@ type InventoryHandler interface {
 type DbHandler interface {
    Open() *ErrHandler
    GetItemById(int, *Item) *ErrHandler
+   AddItem(Item) *ErrHandler
+   DelItemById(id int) *ErrHandler
 }

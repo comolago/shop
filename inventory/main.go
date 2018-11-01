@@ -60,9 +60,14 @@ func main() {
    addItemEndpoint := usecases.MakeAddItemEndpoint(svc)
    addItemEndpoint = ratelimitkit.NewErroringLimiter(addItemEndpointRateLimit)(addItemEndpoint)
 
+   delItemEndpointRateLimit := rate.NewLimiter(rate.Every(35*time.Millisecond), 100)
+   delItemEndpoint := usecases.MakeDelItemEndpoint(svc)
+   delItemEndpoint = ratelimitkit.NewErroringLimiter(delItemEndpointRateLimit)(delItemEndpoint)
+
    endpoint := usecases.Endpoints{
       GetItemEndpoint: getItemEndpoint,
       AddItemEndpoint: addItemEndpoint,
+      DelItemEndpoint: delItemEndpoint,
    }
 
    httpHandler := usecases.MakeHttpHandler(ctx, endpoint, logger)

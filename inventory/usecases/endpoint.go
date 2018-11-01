@@ -23,6 +23,7 @@ type StringResponse struct {
 type Endpoints struct {
    GetItemEndpoint endpoint.Endpoint
    AddItemEndpoint endpoint.Endpoint
+   DelItemEndpoint endpoint.Endpoint
 }
 
 // Create a Mux router with all the endpoints
@@ -36,6 +37,12 @@ func MakeHttpHandler(_ context.Context, endpoint Endpoints, logger log.Logger) h
       endpoint.GetItemEndpoint,
       DecodeGetItemRequest,
       EncodeItemResponse,
+      options...,
+   ))
+   r.Methods("DELETE").Path("/items/{id}").Handler(httptransport.NewServer(
+      endpoint.DelItemEndpoint,
+      DecodeDelItemRequest,
+      EncodeStringResponse,
       options...,
    ))
    r.Methods("POST").Path("/items/add").Handler(httptransport.NewServer(
