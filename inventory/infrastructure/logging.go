@@ -69,3 +69,30 @@ func (mw loggingMiddleware) DelItemById(id int) (output string, err *domain.ErrH
    output, err  = mw.InventoryHandler.DelItemById(id)
    return output, err 
 }
+
+type loggingAuthMiddleware struct {
+        next   AuthHandler
+        logger log.Logger
+}
+
+// Define logging function
+func LoggingAuthMiddleware(logger log.Logger) AuthMiddleware {
+   return func(next AuthHandler) AuthHandler {
+      return loggingAuthMiddleware{next, logger}
+   }
+}
+
+func (mw loggingAuthMiddleware) Auth(clientID string, clientSecret string) (token string, err error) {
+        defer func(begin time.Time) {
+                _ = mw.logger.Log(
+                        "method", "auth",
+                        "clientID", clientID,
+                        "token", token,
+                        "err", err,
+                        "took", time.Since(begin),
+                )
+        }(time.Now())
+
+        token, err = mw.next.Auth(clientID, clientSecret)
+        return
+}
