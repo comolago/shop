@@ -57,6 +57,7 @@ func DecodeGetItemRequest(_ context.Context, r *http.Request) (interface{}, erro
    }
 }
 
+
 // Create AddItem endpoint
 func MakeAddItemEndpoint(svc domain.InventoryHandler) endpoint.Endpoint {
    return func(_ context.Context, request interface{}) (interface{}, error) {

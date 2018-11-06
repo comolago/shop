@@ -11,6 +11,9 @@ import (
    httptransport "github.com/go-kit/kit/transport/http"
    "github.com/prometheus/client_golang/prometheus/promhttp"
    "github.com/comolago/shop/inventory/domain"
+
+
+   gokitjwt "github.com/go-kit/kit/auth/jwt"
 )
 
 // Response type with a string message
@@ -24,33 +27,56 @@ type Endpoints struct {
    GetItemEndpoint endpoint.Endpoint
    AddItemEndpoint endpoint.Endpoint
    DelItemEndpoint endpoint.Endpoint
+   AuthEndpoint endpoint.Endpoint
 }
 
 // Create a Mux router with all the endpoints
 func MakeHttpHandler(_ context.Context, endpoint Endpoints, logger log.Logger) http.Handler {
    r := mux.NewRouter()
-   options := []httptransport.ServerOption{
+   jwtOptions := []httptransport.ServerOption{
       httptransport.ServerErrorLogger(logger),
       httptransport.ServerErrorEncoder(encodeError),
+      httptransport.ServerBefore(gokitjwt.HTTPToContext()), 
    }
+
+   options := []httptransport.ServerOption{
+      httptransport.ServerErrorEncoder(AuthErrorEncoder),
+      httptransport.ServerErrorLogger(logger),
+   }
+
+   r.Methods("POST").Path("/auth").Handler(httptransport.NewServer(
+      endpoint.AuthEndpoint,
+      DecodeAuthRequest,
+      //EncodeStringResponse,
+      EncodeAuthResponse,
+      options...,
+   ))
+
    r.Methods("GET").Path("/items/get/{type}/{id}").Handler(httptransport.NewServer(
       endpoint.GetItemEndpoint,
       DecodeGetItemRequest,
       EncodeItemResponse,
-      options...,
+      jwtOptions...,
+   ))
+
+   /*r.Methods("GET").Path("/items/get/{type}/{id}").Handler(httptransport.NewServer(
+      endpoint.GetItemEndpoint,
+      DecodeGetItemRequest,
+      EncodeItemResponse,
+      jwtOptions...,
    ))
    r.Methods("DELETE").Path("/items/{id}").Handler(httptransport.NewServer(
       endpoint.DelItemEndpoint,
       DecodeDelItemRequest,
       EncodeStringResponse,
-      options...,
+      jwtOptions...,
    ))
    r.Methods("POST").Path("/items/add").Handler(httptransport.NewServer(
       endpoint.AddItemEndpoint,
       DecodeAddItemRequest,
       EncodeStringResponse,
-      options...,
-   ))
+      jwtOptions...,
+   ))*/
    r.Methods("GET").Path("/metrics").Handler(promhttp.Handler())
    return r
 }
@@ -78,6 +104,10 @@ func EncodeStringResponse(ctx context.Context, w http.ResponseWriter, response i
    return json.NewEncoder(w).Encode(response)
 }
 
+func EncodeAuthResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
+        return json.NewEncoder(w).Encode(response)
+}
+
 // Encode a response of ItemResponse type
 func EncodeItemResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
    e := response.(ItemResponse).Err
@@ -88,3 +118,5 @@ func EncodeItemResponse(ctx context.Context, w http.ResponseWriter, response int
    w.Header().Set("Content-Type", "application/json; charset=utf-8")
    return json.NewEncoder(w).Encode(response)
 }
+
+
