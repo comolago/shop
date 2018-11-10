@@ -6,6 +6,7 @@ package domain
 // AddItem add one item to the inventory
 // GetItemById retrieve an item given its id
 type InventoryHandler interface {
+   GetDBHandler() DbHandler
    Open() *ErrHandler
    AddItem(item Item) (string, *ErrHandler)
    GetItemById(id int) (Item, *ErrHandler)
@@ -20,4 +21,5 @@ type DbHandler interface {
    GetItemById(int, *Item) *ErrHandler
    AddItem(Item) *ErrHandler
    DelItemById(id int) *ErrHandler
+   AuthenticateUser(string, string) (int, *ErrHandler)
 }

@@ -8,12 +8,13 @@ import (
    "github.com/go-kit/kit/endpoint"
    "github.com/gorilla/mux"
    "github.com/go-kit/kit/log"
-   httptransport "github.com/go-kit/kit/transport/http"
    "github.com/prometheus/client_golang/prometheus/promhttp"
    "github.com/comolago/shop/inventory/domain"
+   "github.com/comolago/shop/inventory/infrastructure"
 
-
+   httptransport "github.com/go-kit/kit/transport/http"
    gokitjwt "github.com/go-kit/kit/auth/jwt"
+
 )
 
 // Response type with a string message
@@ -31,13 +32,8 @@ type Endpoints struct {
 }
 
 // Create a Mux router with all the endpoints
-func MakeHttpHandler(_ context.Context, endpoint Endpoints, logger log.Logger) http.Handler {
+func MakeHttpHandler(_ context.Context, endpoint Endpoints, authMethod domain.AuthHandler, logger log.Logger) http.Handler {
    r := mux.NewRouter()
-   jwtOptions := []httptransport.ServerOption{
-      httptransport.ServerErrorLogger(logger),
-      httptransport.ServerErrorEncoder(encodeError),
-      httptransport.ServerBefore(gokitjwt.HTTPToContext()), 
-   }
 
    options := []httptransport.ServerOption{
       httptransport.ServerErrorEncoder(AuthErrorEncoder),
@@ -53,30 +49,24 @@ func MakeHttpHandler(_ context.Context, endpoint Endpoints, logger log.Logger) h
    ))
 
    r.Methods("GET").Path("/items/get/{type}/{id}").Handler(httptransport.NewServer(
-      endpoint.GetItemEndpoint,
+      infrastructure.MakeSecureEndpoint(endpoint.GetItemEndpoint, authMethod),
       DecodeGetItemRequest,
       EncodeItemResponse,
-      jwtOptions...,
+      append(options, httptransport.ServerBefore(gokitjwt.HTTPToContext()))...,
    ))
 
-   /*r.Methods("GET").Path("/items/get/{type}/{id}").Handler(httptransport.NewServer(
-      endpoint.GetItemEndpoint,
-      DecodeGetItemRequest,
-      EncodeItemResponse,
-      jwtOptions...,
-   ))
    r.Methods("DELETE").Path("/items/{id}").Handler(httptransport.NewServer(
       endpoint.DelItemEndpoint,
       DecodeDelItemRequest,
       EncodeStringResponse,
-      jwtOptions...,
+      append(options, httptransport.ServerBefore(gokitjwt.HTTPToContext()))...,
    ))
    r.Methods("POST").Path("/items/add").Handler(httptransport.NewServer(
       endpoint.AddItemEndpoint,
       DecodeAddItemRequest,
       EncodeStringResponse,
-      jwtOptions...,
-   ))*/
+      append(options, httptransport.ServerBefore(gokitjwt.HTTPToContext()))...,
+   ))
    r.Methods("GET").Path("/metrics").Handler(promhttp.Handler())
    return r
 }

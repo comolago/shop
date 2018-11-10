@@ -18,8 +18,6 @@ import (
    "github.com/comolago/shop/inventory/infrastructure"
    "github.com/comolago/shop/inventory/usecases"
 
-   jwt "github.com/dgrijalva/jwt-go"
-   gokitjwt "github.com/go-kit/kit/auth/jwt"
 )
 
 func main() {
@@ -55,17 +53,8 @@ func main() {
    svc = infrastructure.LoggingMiddleware(logger)(svc)
    svc = infrastructure.Metrics(requestCount, requestLatency)(svc)
 
-   //getItemEndpointRateLimit := rate.NewLimiter(rate.Every(35*time.Millisecond), 100)
-   //getItemEndpoint := usecases.MakeGetItemEndpoint(svc)
-   //getItemEndpoint = ratelimitkit.NewErroringLimiter(getItemEndpointRateLimit)(getItemEndpoint)
-
-   key := []byte("supersecret")
-   keys := func(token *jwt.Token) (interface{}, error) {
-      return key, nil
-   }
-
    getItemEndpointRateLimit := rate.NewLimiter(rate.Every(35*time.Millisecond), 100)
-   getItemEndpoint := gokitjwt.NewParser(keys, jwt.SigningMethodHS256, func() jwt.Claims { return &infrastructure.CustomClaims{} })(usecases.MakeGetItemEndpoint(svc))
+   getItemEndpoint := usecases.MakeGetItemEndpoint(svc)
    getItemEndpoint = ratelimitkit.NewErroringLimiter(getItemEndpointRateLimit)(getItemEndpoint)
 
    addItemEndpointRateLimit := rate.NewLimiter(rate.Every(35*time.Millisecond), 100)
@@ -77,20 +66,16 @@ func main() {
    delItemEndpoint = ratelimitkit.NewErroringLimiter(delItemEndpointRateLimit)(delItemEndpoint)
 
 
-   // API clients database
-   var clients = map[string]string{
-      "mobile": "m_secret",
-      "web":    "w_secret",
-   }
-   var auth infrastructure.AuthHandler
-   auth = infrastructure.AuthService{key, clients}
+   key := []byte("supersecret")
+
+   var auth domain.AuthHandler
+   auth = infrastructure.AuthService{key, svc.GetDBHandler()}
    auth = infrastructure.LoggingAuthMiddleware(logger)(auth)
    //auth = instrumentingAuthMiddleware{requestAuthCount, requestAuthLatency, auth}
    
    authEndpointRateLimit := rate.NewLimiter(rate.Every(35*time.Millisecond), 100)
    authEndpoint := usecases.MakeAuthEndpoint(auth)
    authEndpoint = ratelimitkit.NewErroringLimiter(authEndpointRateLimit)(authEndpoint)
-
 
    endpoint := usecases.Endpoints{
       GetItemEndpoint: getItemEndpoint,
@@ -99,7 +84,7 @@ func main() {
       AuthEndpoint: authEndpoint,
    }
 
-   httpHandler := usecases.MakeHttpHandler(ctx, endpoint, logger)
+   httpHandler := usecases.MakeHttpHandler(ctx, endpoint, auth, logger)
 
    go func() {
       fmt.Println("Starting server at port 8080")

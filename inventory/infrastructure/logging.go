@@ -71,13 +71,13 @@ func (mw loggingMiddleware) DelItemById(id int) (output string, err *domain.ErrH
 }
 
 type loggingAuthMiddleware struct {
-        next   AuthHandler
+        next   domain.AuthHandler
         logger log.Logger
 }
 
 // Define logging function
 func LoggingAuthMiddleware(logger log.Logger) AuthMiddleware {
-   return func(next AuthHandler) AuthHandler {
+   return func(next domain.AuthHandler) domain.AuthHandler {
       return loggingAuthMiddleware{next, logger}
    }
 }
@@ -96,3 +96,25 @@ func (mw loggingAuthMiddleware) Auth(clientID string, clientSecret string) (toke
         token, err = mw.next.Auth(clientID, clientSecret)
         return
 }
+
+func (mw loggingAuthMiddleware) GetSecret() []byte{
+        defer func(begin time.Time) {
+                _ = mw.logger.Log(
+                        "method", "GetSecret",
+                        "took", time.Since(begin),
+                )
+        }(time.Now())
+
+        return mw.next.GetSecret()
+}
+
+func (mw loggingAuthMiddleware) SetSecret(secret []byte){
+        defer func(begin time.Time) {
+                _ = mw.logger.Log(
+                        "method", "SetSecret",
+                        "took", time.Since(begin),
+                )
+        }(time.Now())
+        mw.next.SetSecret(secret)
+}
+

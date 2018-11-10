@@ -4,6 +4,11 @@
 	"GodepVersion": "v80",
 	"Deps": [
 		{
+			"ImportPath": "github.com/BurntSushi/toml",
+			"Comment": "v0.3.1",
+			"Rev": "3012a1dbe2e4bd1391d42b32f0577cb7bbc7f005"
+		},
+		{
 			"ImportPath": "github.com/beorn7/perks/quantile",
 			"Rev": "3a771d992973f24aa725d07868b467d1ddfceafb"
 		},
@@ -93,6 +98,19 @@
 			"Rev": "521ea7b17d02faf8d3afea6737573942ceac59c5"
 		},
 		{
+			"ImportPath": "github.com/hashicorp/go-uuid",
+			"Comment": "v1.0.0",
+			"Rev": "de160f5c59f693fed329e73e291bb751fe4ea4dc"
+		},
+		{
+			"ImportPath": "github.com/jcmturner/gofork/encoding/asn1",
+			"Rev": "2aebee971930cd0dd525873330952ab7df5ac95c"
+		},
+		{
+			"ImportPath": "github.com/jcmturner/gofork/x/crypto/pbkdf2",
+			"Rev": "2aebee971930cd0dd525873330952ab7df5ac95c"
+		},
+		{
 			"ImportPath": "github.com/juju/ratelimit",
 			"Comment": "v1.0.1",
 			"Rev": "59fac5042749a5afb9af70e813da1dd5474f0167"
@@ -163,6 +181,14 @@
 		{
 			"ImportPath": "github.com/prometheus/procfs/xfs",
 			"Rev": "185b4288413d2a0dd0806f78c90dde719829e5ae"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/md4",
+			"Rev": "e4dc69e5b2fd71dcaf8bd5d054eb936deb78d1fa"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/pbkdf2",
+			"Rev": "e4dc69e5b2fd71dcaf8bd5d054eb936deb78d1fa"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
@@ -363,6 +389,186 @@
 			"ImportPath": "google.golang.org/grpc/tap",
 			"Comment": "v1.2.0-734-g8f2842d",
 			"Rev": "8f2842d4f02a3169c4ff997f95854c35175f20ba"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/aescts.v1",
+			"Comment": "v1.0.1",
+			"Rev": "f6abebb3171c4c1b1fea279cb7c7325020a26290"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/dnsutils.v1",
+			"Comment": "v1.0.1",
+			"Rev": "13eeb8d49ffb74d7a75784c35e4d900607a3943c"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/goidentity.v3",
+			"Comment": "v3.0.0",
+			"Rev": "3a6fd63c09116f950c952b5cb82d039acc7545b1"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/asn1tools",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/client",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/config",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/credentials",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/crypto",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/crypto/common",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/crypto/etype",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/crypto/rfc3961",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/crypto/rfc3962",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/crypto/rfc4757",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/crypto/rfc8009",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/gssapi",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/addrtype",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/adtype",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/asnAppTag",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/chksumtype",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/errorcode",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/etypeID",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/flags",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/keyusage",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/msgtype",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/nametype",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/iana/patype",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/kadmin",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/keytab",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/krberror",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/messages",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/pac",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/service",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/gokrb5.v6/types",
+			"Comment": "v6.0.3",
+			"Rev": "104a6401d0b922a6c697dfe27c67ebf4fb9c8a16"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/rpc.v1/mstypes",
+			"Comment": "v1.1.0",
+			"Rev": "99a8ce2fbf8b8087b6ed12a37c61b10f04070043"
+		},
+		{
+			"ImportPath": "gopkg.in/jcmturner/rpc.v1/ndr",
+			"Comment": "v1.1.0",
+			"Rev": "99a8ce2fbf8b8087b6ed12a37c61b10f04070043"
 		}
 	]
 }
