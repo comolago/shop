@@ -13,6 +13,9 @@ func (i Inventory) Open() *ErrHandler  {
    return i.Db.Open()
 }
 
+func (i Inventory) GetDBHandler() DbHandler  {
+   return i.Db
+}
 // Retrive an Item by its ID from the persistence backend
 func (i Inventory) GetItemById(id int) (Item, *ErrHandler) {
    var item Item
