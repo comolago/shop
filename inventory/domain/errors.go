@@ -16,4 +16,5 @@ var errors = [...]string{
 	10: "Item Id is empty - please provide a value",
 	11: "Item Name is empty - please provide a value",
 	12: "Item Quantity is empty - please provide a value",
+	13: "Query returned no rows",
 }
