@@ -84,7 +84,7 @@ func main() {
       AuthEndpoint: authEndpoint,
    }
 
-   httpHandler := usecases.MakeHttpHandler(ctx, endpoint, auth, logger)
+   httpHandler := usecases.MakeMux(ctx, endpoint, auth, logger)
 
    go func() {
       fmt.Println("Starting server at port 8080")

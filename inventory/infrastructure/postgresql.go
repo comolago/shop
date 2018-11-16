@@ -108,27 +108,47 @@ func (pg *PostgresqlDb)GetItemById(id int, item *domain.Item) *domain.ErrHandler
    if pg.conn == nil {
       return &domain.ErrHandler{7, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", ""}
    }
-   recordset, err := pg.conn.Query("SELECT id, name, quantity FROM inventory WHERE id=$1;", id)
+   recordset := pg.conn.QueryRow("SELECT id, name, quantity FROM inventory WHERE id=$1;", id)
+   var err domain.ErrHandler
+   switch err := recordset.Scan(&item.Id, &item.Name, &item.Quantity); err {
+      case sql.ErrNoRows:
+         return &domain.ErrHandler{13, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", ""}
+      case nil:
+         return nil
+   }
+   return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", err.Error()}
+}
+
+/*
+// Retrieve an Item by its id from database
+func (pg *PostgresqlDb)GetInventory(inventory *domain.Inventory) *domain.ErrHandler {
+   if pg.conn == nil {
+      return &domain.ErrHandler{7, "func (pg PostgresqlDb)", "GetInventory(inventory *domain.Inventory)", ""}
+   }
+   recordset, err := pg.conn.Query("SELECT id, name, quantity FROM inventory;")
    if err != nil {
-      return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", err.Error()}
+      return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "GetInventory(inventory *domain.Inventory)", err.Error()}
    }
    defer recordset.Close()
+   var cnt :=0
    for recordset.Next() {
+      inventory.items.new()
       err = recordset.Scan(
-         &item.Id,
-         &item.Name,
-         &item.Quantity,
+         &inventory.item[cnt].Id,
+         &inventory.item[cnt].Name,
+         &inventory.item[cnt].Quantity,
       )
       if err != nil {
-         return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", err.Error()}
+         return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "GetInventory(inventory *domain.Inventory)", err.Error()}
       }
+      cnt++
    }
    err = recordset.Err()
    if err != nil {
-      return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "getItem(inventory *domain.Inventory)", err.Error()}
+      return &domain.ErrHandler{1, "func (pg PostgresqlDb)", "GetInventory(inventory *domain.Inventory)", err.Error()}
    }
    return nil
-}
+}*/
 
 func (pg *PostgresqlDb)DelItemById(id int) *domain.ErrHandler {
    if pg.conn == nil {
@@ -145,25 +165,16 @@ func (pg *PostgresqlDb)AuthenticateUser(username string, password string) (int, 
    if pg.conn == nil {
       return -1, &domain.ErrHandler{7, "func (pg PostgresqlDb)", "AuthenticateUser(username string, password string)", ""}
    }
-   //recordset, err := pg.conn.Query("select id from users where username='$1' and password = crypt('$2',password);", username, password)
-   recordset, err := pg.conn.Query("select id from users where username='mcarcano' and password = crypt('12345678',password);", username, password)
-   if err != nil {
-      return -1, &domain.ErrHandler{1, "func (pg PostgresqlDb)", "AuthenticateUser(username string, password string)", err.Error()}
-   }
+   recordset := pg.conn.QueryRow("select id from users where username=$1 and password=crypt($2,password);", username, password)
+
    var id int
-   defer recordset.Close()
-   for recordset.Next() {
-      err = recordset.Scan(
-         &id,
-      )
-      if err != nil {
-         return -1, &domain.ErrHandler{1, "func (pg PostgresqlDb)", "AuthenticateUser(username string, password string)", err.Error()}
-      }
+   var err domain.ErrHandler
+   switch err := recordset.Scan(&id); err {
+      case sql.ErrNoRows:
+         return -1, &domain.ErrHandler{13, "func (pg PostgresqlDb)", "AuthenticateUser(username string, password string)", ""}
+      case nil:
+         return id, nil
    }
-   err = recordset.Err()
-   if err != nil {
-      return -1, &domain.ErrHandler{1, "func (pg PostgresqlDb)", "AuthenticateUser(username string, password string)", err.Error()}
-   }
-   return id, nil
+   return -1, &domain.ErrHandler{1, "func (pg PostgresqlDb)", "AuthenticateUser(username string, password string)", err.Error()}
 }
 

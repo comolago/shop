@@ -6,21 +6,7 @@ import (
    "encoding/json"
    "net/http"
    "github.com/go-kit/kit/endpoint"
-   "github.com/go-kit/kit/log"
    "github.com/comolago/shop/inventory/domain"
-
-   httptransport "github.com/go-kit/kit/transport/http"
-
-
-   "os"
-   "gopkg.in/jcmturner/gokrb5.v6/keytab"
-   "gopkg.in/jcmturner/gokrb5.v6/service"
-   lg "log"
-
-   "github.com/gorilla/mux"
-   "github.com/prometheus/client_golang/prometheus/promhttp"
-   "github.com/comolago/shop/inventory/infrastructure"
-   gokitjwt "github.com/go-kit/kit/auth/jwt"
 )
 
 // Response type with a string message
@@ -35,59 +21,6 @@ type Endpoints struct {
    AddItemEndpoint endpoint.Endpoint
    DelItemEndpoint endpoint.Endpoint
    AuthEndpoint endpoint.Endpoint
-}
-
-// Create a Mux router with all the endpoints
-func MakeHttpHandler(_ context.Context, endpoint Endpoints, authMethod domain.AuthHandler, logger log.Logger) http.Handler {
-
-   l := lg.New(os.Stderr, "GOKRB5 Service: ", lg.Ldate|lg.Ltime|lg.Lshortfile)
-   kt, _ := keytab.Load("/home/build/file.keytab")
-   c := service.NewConfig(kt)
-
-   options := []httptransport.ServerOption{
-      httptransport.ServerErrorEncoder(AuthErrorEncoder),
-      httptransport.ServerErrorLogger(logger),
-   }
-
-   r := mux.NewRouter()
-
-   r.Methods("POST").Path("/auth").Handler(httptransport.NewServer(
-      endpoint.AuthEndpoint,
-      DecodeAuthRequest,
-      //EncodeStringResponse,
-      EncodeAuthResponse,
-      options...,
-   ))
-
-   r.Methods("GET").Path("/items/get/{type}/{id}").Handler(httptransport.NewServer(
-      infrastructure.MakeSecureEndpoint(endpoint.GetItemEndpoint, authMethod),
-      DecodeGetItemRequest,
-      EncodeItemResponse,
-      append(options, httptransport.ServerBefore(gokitjwt.HTTPToContext()))...,
-   ))
-
-   r.Methods("DELETE").Path("/items/{id}").Handler(httptransport.NewServer(
-      endpoint.DelItemEndpoint,
-      DecodeDelItemRequest,
-      EncodeStringResponse,
-      append(options, httptransport.ServerBefore(gokitjwt.HTTPToContext()))...,
-   ))
-   /*r.Methods("POST").Path("/items/add").Handler(httptransport.NewServer(
-      endpoint.AddItemEndpoint,
-      DecodeAddItemRequest,
-      EncodeStringResponse,
-      append(options, httptransport.ServerBefore(gokitjwt.HTTPToContext()))...,
-   ))*/ 
-   r.Methods("POST").Path("/items/add").Handler(service.SPNEGOKRB5Authenticate(
-      httptransport.NewServer(
-         endpoint.AddItemEndpoint,
-         DecodeAddItemRequest,
-         EncodeStringResponse,
-         options...,
-      ),c, l))
-   
-   r.Methods("GET").Path("/metrics").Handler(promhttp.Handler())
-   return r 
 }
 
 // Encode the error message
